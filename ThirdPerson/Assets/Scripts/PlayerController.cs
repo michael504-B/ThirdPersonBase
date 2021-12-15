@@ -24,8 +24,13 @@ public class PlayerController : MonoBehaviour
 
     bool startedCombo = false;
     bool swordAxeReturn = false;
+    bool activated;
+
 
     float timeSinceButtonPressed = 0.0f;
+
+    [SerializeField]
+    float saxRotation;
 
     [SerializeField]
     float throwStr = 25;
@@ -81,7 +86,12 @@ public class PlayerController : MonoBehaviour
 
         if(Input.GetButtonDown("Fire1"))
         {
+            anim.SetTrigger("throw");
             SwordAxeThorw();
+        }
+       if (activated)
+        {
+            transform.localEulerAngles += transform.forward * saxRotation * Time.deltaTime;
         }
         /*code dont work
         if (Input.GetButton("Fire2"))
@@ -145,6 +155,12 @@ public class PlayerController : MonoBehaviour
         cam.fieldOfView = (defaultFOV / 2);
 
     }
-    
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        activated = false;
+        //GetComponent<Rigidbody>().isKinematic = true;
+    }
+
 
 }
