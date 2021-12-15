@@ -5,20 +5,40 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Variables")]
+
     [SerializeField]
     float moveSpeed = 3.0f;
 
     [Header("References")]
+
     [SerializeField]
     Transform mainCamera;
+
     [SerializeField]
     BoxCollider swordCollider;
 
+    public Rigidbody swordAxe;
     Rigidbody rb;
+
     Animator anim;
 
     bool startedCombo = false;
+    bool swordAxeReturn = false;
+
     float timeSinceButtonPressed = 0.0f;
+
+    [SerializeField]
+    float throwStr = 25;
+    
+    [SerializeField]
+    Camera cam;
+
+    [SerializeField]
+    float defaultFOV = 90;
+    
+
+   
+
 
     // Start is called before the first frame update
     void Start()
@@ -59,6 +79,19 @@ public class PlayerController : MonoBehaviour
             timeSinceButtonPressed = 0;
         }
 
+        if(Input.GetButtonDown("Fire1"))
+        {
+            SwordAxeThorw();
+        }
+        /*code dont work
+        if (Input.GetButton("Fire2"))
+        {
+            Aiming();
+        }
+        else
+            cam.fieldOfView = (defaultFOV);
+        */
+
         timeSinceButtonPressed += Time.deltaTime;
     }
 
@@ -91,5 +124,27 @@ public class PlayerController : MonoBehaviour
     {
         swordCollider.enabled = false;
     }
+
+    public void SwordAxeThorw()
+    {
+        swordAxeReturn = false;
+        swordAxe.isKinematic = false;
+        swordAxe.transform.parent = null;
+        swordAxe.AddForce(transform.forward * throwStr,ForceMode.Impulse);
+    }
+
+    public void ReturnSwordAxe()
+    {
+        swordAxeReturn = true;
+        swordAxe.isKinematic = true;
+    }
+
+    public void Aiming()
+    {
+
+        cam.fieldOfView = (defaultFOV / 2);
+
+    }
+    
 
 }
