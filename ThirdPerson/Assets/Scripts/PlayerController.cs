@@ -2,9 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    public float InputX;
+    public float InputZ;
+    public Vector3 desiredMoveDirection;
+    public bool blockRotationPlayer;
+    public float desiredRotationSpeed = 0.1f;
+    //public Animator anim;
+    public float Speed;
+    public float allowPlayerRotation = 0.1f;
+    //public Camera cam;
+    public CharacterController controller;
+    //public bool isGrounded;
+
+    private float verticalVel;
+    private Vector3 moveVector;
+    //***********************************************//
     public SwordAxe swordAxe;
+
     [Header("Movement Variables")]
 
     [SerializeField]
@@ -42,22 +59,31 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     float defaultFOV = 90;
-    
-
    
+
+
+
 
 
     // Start is called before the first frame update
     void Start()
     {
+
+        anim = this.GetComponent<Animator>();
+        cam = Camera.main;
+
+        /*
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         swordAxe = swordAxe.GetComponent<SwordAxe>();
+        cam = Camera.main;
+        */
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
@@ -66,6 +92,7 @@ public class PlayerController : MonoBehaviour
 
         camForward.y = 0;
         camForward.Normalize();
+
         camRight.y = 0;
         camRight.Normalize();
 
@@ -73,8 +100,9 @@ public class PlayerController : MonoBehaviour
 
         transform.LookAt(transform.position + moveDirection);
         rb.velocity = new Vector3(moveDirection.x, rb.velocity.y, moveDirection.z);
-
+        
         anim.SetFloat("moveSpeed", Mathf.Abs(moveDirection.magnitude));
+        
 
         if(Input.GetButtonDown("Jump") && !startedCombo)
         {
@@ -92,11 +120,21 @@ public class PlayerController : MonoBehaviour
             anim.SetTrigger("throw");
             //SwordAxeThorw();
         }
-       if (activated)
-       {
-            transform.localEulerAngles += transform.forward * saxRotation * Time.deltaTime;
-       }
-      
+       /* 
+        if(aiming)
+        {
+            RotateToCamera(transform);
+        }
+        else
+        {
+            transform.eulerAngles = new Vector3(Mathf.LerpAngle(transform.eulerAngles.x, 0, .2f), transform.eulerAngles.y, transform.eulerAngles.z);
+        }
+       */
+        
+        if(Input.GetButton("fire2"))
+        {
+            anim.GetBool("aiming");
+        }
         /*code dont work
         if (Input.GetButton("Fire2"))
         {
@@ -108,6 +146,35 @@ public class PlayerController : MonoBehaviour
 
         timeSinceButtonPressed += Time.deltaTime;
     }
+/*
+    void PlayerMoveAndRotation()
+    {
+        InputX = Input.GetAxis("Horizontal");
+        InputZ = Input.GetAxis("Vertical");
+
+        var camera = Camera.main;
+        var forward = cam.transform.forward;
+        var right = cam.transform.right;
+
+        forward.y = 0f;
+        right.y = 0f;
+
+        forward.Normalize();
+        right.Normalize();
+
+        desiredMoveDirection = forward * InputZ + right * InputX;
+
+
+        if (blockRotationPlayer == false)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(desiredMoveDirection), desiredRotationSpeed);
+            controller.Move(desiredMoveDirection * Time.deltaTime * 3);
+        }
+    }
+*/
+
+
+
 
     public void PotentialComboEnd()
     {
@@ -170,4 +237,18 @@ public class PlayerController : MonoBehaviour
     }
 
 
+
+
+   /* public void RotateToCamera(Transform t)
+    {
+
+        var camera = Camera.main;
+        var forward = cam.transform.forward;
+        var right = cam.transform.right;
+
+        desiredMoveDirection = forward;
+
+        t.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(desiredMoveDirection), desiredRotationSpeed);
+    }
+   */
 }
