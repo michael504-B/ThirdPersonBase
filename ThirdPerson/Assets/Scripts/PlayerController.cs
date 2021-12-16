@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public SwordAxe swordAxe;
     [Header("Movement Variables")]
 
     [SerializeField]
@@ -17,13 +18,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     BoxCollider swordCollider;
 
-    public Rigidbody swordAxe;
+    public Rigidbody swordAxeRb;
     Rigidbody rb;
 
     Animator anim;
 
     bool startedCombo = false;
     bool swordAxeReturn = false;
+    bool aiming = false;
     bool activated;
 
 
@@ -50,6 +52,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
+        swordAxe = swordAxe.GetComponent<SwordAxe>();
     }
 
     // Update is called once per frame
@@ -87,12 +90,13 @@ public class PlayerController : MonoBehaviour
         if(Input.GetButtonDown("Fire1"))
         {
             anim.SetTrigger("throw");
-            SwordAxeThorw();
+            //SwordAxeThorw();
         }
        if (activated)
-        {
+       {
             transform.localEulerAngles += transform.forward * saxRotation * Time.deltaTime;
-        }
+       }
+      
         /*code dont work
         if (Input.GetButton("Fire2"))
         {
@@ -138,15 +142,18 @@ public class PlayerController : MonoBehaviour
     public void SwordAxeThorw()
     {
         swordAxeReturn = false;
-        swordAxe.isKinematic = false;
-        swordAxe.transform.parent = null;
-        swordAxe.AddForce(transform.forward * throwStr,ForceMode.Impulse);
+        swordAxe.activated = true;
+        swordAxeRb.isKinematic = false;
+        swordAxeRb.transform.parent = null;
+        swordAxeRb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        swordAxeRb.AddForce(transform.forward * throwStr,ForceMode.Impulse);
     }
 
     public void ReturnSwordAxe()
     {
         swordAxeReturn = true;
-        swordAxe.isKinematic = true;
+        swordAxeRb.isKinematic = true;
     }
 
     public void Aiming()
