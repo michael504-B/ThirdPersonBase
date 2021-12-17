@@ -27,6 +27,8 @@ public class CameraSwitch : MonoBehaviour
             {
                 CamMode = 0;
                 Crosshair.SetActive(true);
+
+               
             }
 
             else
