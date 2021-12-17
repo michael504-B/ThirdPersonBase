@@ -2,26 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    public float InputX;
-    public float InputZ;
-    public Vector3 desiredMoveDirection;
-    public bool blockRotationPlayer;
-    public float desiredRotationSpeed = 0.1f;
-    //public Animator anim;
-    public float Speed;
-    public float allowPlayerRotation = 0.1f;
-    //public Camera cam;
-    public CharacterController controller;
-    //public bool isGrounded;
-
-    private float verticalVel;
-    private Vector3 moveVector;
-    //***********************************************//
     public SwordAxe swordAxe;
-
     [Header("Movement Variables")]
 
     [SerializeField]
@@ -59,31 +42,26 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     float defaultFOV = 90;
-   
 
+    public GameObject FirstPersonCam;
+    public GameObject ThirdPersonCam;
+    public GameObject Crosshair;
 
+    public int CamMode;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
-
-        anim = this.GetComponent<Animator>();
-        cam = Camera.main;
-
-        /*
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         swordAxe = swordAxe.GetComponent<SwordAxe>();
-        cam = Camera.main;
-        */
     }
 
     // Update is called once per frame
     void Update()
     {
-        
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
@@ -92,7 +70,6 @@ public class PlayerController : MonoBehaviour
 
         camForward.y = 0;
         camForward.Normalize();
-
         camRight.y = 0;
         camRight.Normalize();
 
@@ -100,14 +77,32 @@ public class PlayerController : MonoBehaviour
 
         transform.LookAt(transform.position + moveDirection);
         rb.velocity = new Vector3(moveDirection.x, rb.velocity.y, moveDirection.z);
-        
+
         anim.SetFloat("moveSpeed", Mathf.Abs(moveDirection.magnitude));
-        
 
         if(Input.GetButtonDown("Jump") && !startedCombo)
         {
             anim.SetTrigger("swordCombo");
             startedCombo = true;
+
+            if (Input.GetButtonDown("Cam"))
+            {
+                if (CamMode == 1)
+                {
+                    CamMode = 0;
+                    Crosshair.SetActive(true);
+
+
+                }
+                else
+                {
+                    CamMode += 1;
+                    Crosshair.SetActive(false);
+                }
+                StartCoroutine(CamChange());
+            }
+
+
         }
 
         if(Input.GetButtonDown("Jump") && startedCombo)
@@ -120,21 +115,9 @@ public class PlayerController : MonoBehaviour
             anim.SetTrigger("throw");
             //SwordAxeThorw();
         }
-       /* 
-        if(aiming)
-        {
-            RotateToCamera(transform);
-        }
-        else
-        {
-            transform.eulerAngles = new Vector3(Mathf.LerpAngle(transform.eulerAngles.x, 0, .2f), transform.eulerAngles.y, transform.eulerAngles.z);
-        }
-       */
         
-        if(Input.GetButton("fire2"))
-        {
-            anim.GetBool("aiming");
-        }
+        
+      
         /*code dont work
         if (Input.GetButton("Fire2"))
         {
@@ -146,35 +129,26 @@ public class PlayerController : MonoBehaviour
 
         timeSinceButtonPressed += Time.deltaTime;
     }
-/*
-    void PlayerMoveAndRotation()
+
+    IEnumerator CamChange()
     {
-        InputX = Input.GetAxis("Horizontal");
-        InputZ = Input.GetAxis("Vertical");
-
-        var camera = Camera.main;
-        var forward = cam.transform.forward;
-        var right = cam.transform.right;
-
-        forward.y = 0f;
-        right.y = 0f;
-
-        forward.Normalize();
-        right.Normalize();
-
-        desiredMoveDirection = forward * InputZ + right * InputX;
-
-
-        if (blockRotationPlayer == false)
+        yield return new WaitForSeconds(0.1f);
+        if (CamMode == 0)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(desiredMoveDirection), desiredRotationSpeed);
-            controller.Move(desiredMoveDirection * Time.deltaTime * 3);
+
+            FirstPersonCam.SetActive(true);
+            ThirdPersonCam.SetActive(false);
+
         }
+        if (CamMode == 1)
+        {
+
+            FirstPersonCam.SetActive(false);
+            ThirdPersonCam.SetActive(true);
+
+        }
+
     }
-*/
-
-
-
 
     public void PotentialComboEnd()
     {
@@ -237,18 +211,4 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
-
-   /* public void RotateToCamera(Transform t)
-    {
-
-        var camera = Camera.main;
-        var forward = cam.transform.forward;
-        var right = cam.transform.right;
-
-        desiredMoveDirection = forward;
-
-        t.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(desiredMoveDirection), desiredRotationSpeed);
-    }
-   */
 }
